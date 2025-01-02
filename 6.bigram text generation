@@ -1,0 +1,103 @@
+import random
+def build_bigram_model(sentences):
+    bigram_model = {}
+    for sentence in sentences:
+        tokens = sentence.split()
+        for i in range(len(tokens) - 1):
+            current_word = tokens[i]
+            next_word = tokens[i + 1]
+            if current_word in bigram_model:
+                bigram_model[current_word].append(next_word)
+            else:
+                bigram_model[current_word] = [next_word]
+    return bigram_model
+def generate_text(bigram_model, start_word, length=10):
+    generated_text = [start_word]
+    for _ in range(length - 1):
+        if start_word in bigram_model:
+            next_word = random.choice(bigram_model[start_word])
+            generated_text.append(next_word)
+            start_word = next_word
+        else:
+            break
+    return ' '.join(generated_text)
+sentences = [
+    "I love programming in Python.",
+    "Python is a versatile programming language.",
+    "Text generation using bigram models is interesting.",
+    "Natural Language Processing involves analyzing and generating text."
+]
+bigram_model = build_bigram_model(sentences)
+print(bigram_model)
+generated_text = generate_text(bigram_model, start_word="I", length=8)
+print("Generated Text:", generated_text)
+ 12 changes: 12 additions & 0 deletions12  
+program-7
+Original file line number	Diff line number	Diff line change
+@@ -0,0 +1,12 @@
+import nltk
+nltk.download('wordnet')
+nltk.download('punkt')
+nltk.download('averaged_perceptron_tagger')
+
+sentence = "the sun is shining brightly,I love reading interesting books."
+tokens = nltk.word_tokenize(sentence)
+
+for token in tokens:
+    pos_tag = nltk.pos_tag([token])[0][1]
+    lemmatized_word = nltk.WordNetLemmatizer().lemmatize(token)
+    print(f"org: {token}, pos={pos_tag}, Lemma={lemmatized_word}")
+ 28 changes: 28 additions & 0 deletions28  
+program-8
+Original file line number	Diff line number	Diff line change
+@@ -0,0 +1,28 @@
+import random
+def train_unigram_model(tagged_corpus):
+    unigram_model = {}
+    for sentence in tagged_corpus:
+        for word, pos_tag in sentence:
+            if word in unigram_model:
+                unigram_model[word].append(pos_tag)
+            else:
+                unigram_model[word] = [pos_tag]
+    return unigram_model
+def stochastic_pos_tagging(sentence, unigram_model):
+    tagged_sentence = []
+    for word in sentence:
+        if word in unigram_model:
+            pos_tag = random.choice(unigram_model[word])
+        else:
+            pos_tag = 'NOUN'
+        tagged_sentence.append((word, pos_tag))
+    return tagged_sentence
+tagged_corpus = [
+    [('The', 'DET'), ('quick', 'ADJ'), ('brown', 'ADJ'), ('fox', 'NOUN')],
+    [('Jumped', 'VERB'), ('over', 'PREP'), ('the', 'DET'), ('lazy', 'ADJ'), ('dog', 'NOUN')]
+]
+unigram_model = train_unigram_model(tagged_corpus)
+sentence_to_tag = ['The', 'lazy', 'fox', 'jumped']
+tagged_sentence = stochastic_pos_tagging(sentence_to_tag, unigram_model)
+print("Original Sentence:", sentence_to_tag)
+print("Stochastic POS Tagging Result:", tagged_sentence)
+ 18 changes: 18 additions & 0 deletions18  
+program-9
+Original file line number	Diff line number	Diff line change
+@@ -0,0 +1,18 @@
+import re
+def rule_based_pos_tagging(sentence):
+    tagged_sentence = []
+    for word in sentence:
+        if re.match(r'\b(?:is|am|are|was|were)\b', word, re.IGNORECASE):
+            pos_tag = 'VERB'
+        elif re.match(r'\b(?:the|a|an)\b', word, re.IGNORECASE):
+            pos_tag = 'DET'
+        elif re.match(r'\b(?:quick|brown|lazy)\b', word, re.IGNORECASE):
+            pos_tag = 'ADJ'
+        else:
+            pos_tag = 'NOUN'
+        tagged_sentence.append((word, pos_tag))
+    return tagged_sentence
+sentence_to_tag = ['The', 'quick', 'brown', 'fox', 'is', 'lazy']
+tagged_sentence = rule_based_pos_tagging(sentence_to_tag)
+print("Original Sentence:", sentence_to_tag)
+print("Rule-based POS Tagging Result:", tagged_sentence)
